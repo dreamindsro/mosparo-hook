@@ -15,9 +15,12 @@ export function resolveClientConfig(): MosparoConfig | null {
 }
 
 export function resolveServerConfig(): MosparoServerConfig | null {
-  const host = process.env.MOSPARO_HOST;
-  const uuid = process.env.MOSPARO_UUID;
-  const publicKey = process.env.MOSPARO_PUBLIC_KEY;
+  const host =
+    process.env.MOSPARO_HOST ?? process.env.NEXT_PUBLIC_MOSPARO_HOST;
+  const uuid =
+    process.env.MOSPARO_UUID ?? process.env.NEXT_PUBLIC_MOSPARO_UUID;
+  const publicKey =
+    process.env.MOSPARO_PUBLIC_KEY ?? process.env.NEXT_PUBLIC_MOSPARO_PUBLIC_KEY;
   const privateKey = process.env.MOSPARO_PRIVATE_KEY;
 
   if (!host || !uuid || !publicKey || !privateKey) return null;
