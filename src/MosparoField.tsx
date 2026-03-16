@@ -73,7 +73,10 @@ export function MosparoField({
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    const mergedOptions: Record<string, unknown> = { ...options };
+    const mergedOptions: Record<string, unknown> = {
+      loadCssResource: true,
+      ...options,
+    };
 
     // Wire up callbacks via refs so closures stay stable
     const cbs = callbacksRef.current;
