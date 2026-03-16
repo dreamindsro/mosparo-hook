@@ -140,5 +140,17 @@ export function MosparoField({
 
   if (!configValid) return null;
 
-  return <div id={containerId} className={className} style={style} />;
+  return (
+    <div
+      className={className}
+      style={{
+        position: 'relative',
+        overflow: 'hidden',
+        ...style,
+      }}
+    >
+      <style>{`#${containerId} .mosparo__overlay { position: absolute; }`}</style>
+      <div id={containerId} />
+    </div>
+  );
 }
