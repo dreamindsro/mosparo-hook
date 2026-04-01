@@ -1,18 +1,15 @@
-# @dreamindsro/mosparo-hook
+# @dreamind-tools/mosparo-hook
+
+[![npm version](https://img.shields.io/npm/v/@dreamind-tools/mosparo-hook)](https://www.npmjs.com/package/@dreamind-tools/mosparo-hook)
+[![license](https://img.shields.io/npm/l/@dreamind-tools/mosparo-hook)](https://github.com/dreamindsro/mosparo-hook/blob/main/LICENSE)
 
 React/Next.js integration for [mosparo](https://mosparo.io) spam protection.
 
 ## Installation
 
 ```bash
-npm install @dreamindsro/mosparo-hook
+npm install @dreamind-tools/mosparo-hook
 ```
-
-> Since this package is hosted on GitHub Packages, add an `.npmrc` to your project root:
->
-> ```
-> @dreamindsro:registry=https://npm.pkg.github.com
-> ```
 
 ### Peer dependencies
 
@@ -41,7 +38,7 @@ The first three are used by both the client component and server verification. T
 Drop the component into any form. It renders the mosparo captcha widget and automatically loads the mosparo frontend script.
 
 ```tsx
-import { MosparoField } from '@dreamindsro/mosparo-hook';
+import { MosparoField } from '@dreamind-tools/mosparo-hook';
 
 export function ContactForm() {
   return (
@@ -88,7 +85,7 @@ If you prefer passing config via props instead of environment variables:
 Verify form submissions on the server using `@mosparo/api-client` under the hood.
 
 ```ts
-import { verifySubmission } from '@dreamindsro/mosparo-hook/server';
+import { verifySubmission } from '@dreamind-tools/mosparo-hook/server';
 ```
 
 #### Next.js Server Action
@@ -96,7 +93,7 @@ import { verifySubmission } from '@dreamindsro/mosparo-hook/server';
 ```ts
 'use server';
 
-import { verifySubmission } from '@dreamindsro/mosparo-hook/server';
+import { verifySubmission } from '@dreamind-tools/mosparo-hook/server';
 
 export async function submitContact(formData: FormData) {
   const result = await verifySubmission(formData);
@@ -112,7 +109,7 @@ export async function submitContact(formData: FormData) {
 #### Next.js API Route
 
 ```ts
-import { verifySubmission } from '@dreamindsro/mosparo-hook/server';
+import { verifySubmission } from '@dreamind-tools/mosparo-hook/server';
 
 export async function POST(request: Request) {
   const formData = await request.formData();
