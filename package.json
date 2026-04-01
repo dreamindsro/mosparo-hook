@@ -1,6 +1,6 @@
 {
   "name": "@dreamind-tools/mosparo-hook",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "type": "module",
   "description": "React/Next.js integration for mosparo spam protection",
   "license": "MIT",
