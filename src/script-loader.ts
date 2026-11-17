@@ -22,7 +22,10 @@ export function loadMosparoScript(host: string): Promise<void> {
     script.async = true;
     script.onload = () => resolve();
     script.onerror = () => {
+      // Remove the failed tag too: left in the DOM, the next call would find
+      // it above and report the script as loaded.
       loadPromises.delete(url);
+      script.remove();
       reject(new Error(`Failed to load mosparo script from ${url}`));
     };
     document.head.appendChild(script);

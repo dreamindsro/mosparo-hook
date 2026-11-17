@@ -81,4 +81,24 @@ describe('loadMosparoScript', () => {
       'Failed to load mosparo script from https://mosparo.test/build/mosparo-frontend.js',
     );
   });
+
+  it('downloads the script again when it is requested after a failure', async () => {
+    const failed = loadMosparoScript(HOST);
+    const [failedScript] = mosparoScripts();
+    failScriptLoad(failedScript);
+    await expect(failed).rejects.toThrow();
+
+    const onLoaded = vi.fn();
+    const retry = loadMosparoScript(HOST).then(onLoaded);
+    await new Promise((resolve) => setTimeout(resolve));
+
+    const scripts = mosparoScripts();
+    expect(scripts).toHaveLength(1);
+    expect(scripts[0]).not.toBe(failedScript);
+    expect(onLoaded).not.toHaveBeenCalled();
+
+    finishScriptLoad(scripts[0]);
+    await retry;
+    expect(onLoaded).toHaveBeenCalledOnce();
+  });
 });
