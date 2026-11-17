@@ -85,8 +85,13 @@ export async function verifySubmission(
       issues: result.getIssues(),
     };
   } catch (err) {
+    // @mosparo/api-client rejects with plain strings, not Error objects
     const message =
-      err instanceof Error ? err.message : 'Unknown verification error';
+      err instanceof Error
+        ? err.message
+        : typeof err === 'string' && err
+          ? err
+          : 'Unknown verification error';
     return fail(message);
   }
 }

@@ -246,5 +246,19 @@ describe('verifySubmission', () => {
         error: 'socket hang up',
       });
     });
+
+    it('passes on the reason the API client gives as a plain string', async () => {
+      // The real client rejects with strings, such as the message of the
+      // underlying HTTP error.
+      apiVerifySubmission.mockRejectedValue('Request failed with status code 401');
+
+      const result = await verifySubmission({ name: 'Ada', ...tokens }, { config });
+
+      expect(result).toMatchObject({
+        success: false,
+        valid: false,
+        error: 'Request failed with status code 401',
+      });
+    });
   });
 });
