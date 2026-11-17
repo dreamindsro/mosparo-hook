@@ -1,6 +1,7 @@
 # @dreamind-tools/mosparo-hook
 
 [![npm version](https://img.shields.io/npm/v/@dreamind-tools/mosparo-hook)](https://www.npmjs.com/package/@dreamind-tools/mosparo-hook)
+[![CI](https://github.com/dreamindsro/mosparo-hook/actions/workflows/ci.yml/badge.svg)](https://github.com/dreamindsro/mosparo-hook/actions/workflows/ci.yml)
 [![license](https://img.shields.io/npm/l/@dreamind-tools/mosparo-hook)](https://github.com/dreamindsro/mosparo-hook/blob/main/LICENSE)
 
 React/Next.js integration for [mosparo](https://mosparo.io) spam protection.
@@ -149,6 +150,18 @@ interface VerifySubmissionResult {
   error?: string;            // Error message if success is false
 }
 ```
+
+## Development
+
+```bash
+npm install
+npm test            # run the tests once (Vitest)
+npm run test:watch  # re-run tests on change
+npm run typecheck
+npm run build       # bundle to dist/ with tsup
+```
+
+The tests live in `tests/` and run without a mosparo instance: the widget script and `@mosparo/api-client` are mocked. CI runs typecheck, tests and build on Node.js 22, 24 and 26.
 
 ## License
 
