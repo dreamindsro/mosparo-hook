@@ -54,4 +54,11 @@ describe('useMosparoScript', () => {
     expect(result.current).toBe('ready');
     expect(mosparoScripts()).toHaveLength(0);
   });
+
+  it('requests nothing when there is no host', () => {
+    const { result } = renderHook(() => useMosparoScript(''));
+
+    expect(result.current).toBe('loading');
+    expect(mosparoScripts()).toHaveLength(0);
+  });
 });

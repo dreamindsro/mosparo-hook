@@ -11,6 +11,9 @@ export function useMosparoScript(host: string): ScriptStatus {
   });
 
   useEffect(() => {
+    // No host means the field has no usable config; there is nothing to load.
+    if (!host) return;
+
     if (typeof window.mosparo === 'function') {
       setStatus('ready');
       return;

@@ -101,12 +101,13 @@ describe('MosparoField configuration', () => {
     );
   });
 
-  it('renders nothing and says why when the configuration is incomplete', () => {
+  it('renders nothing, loads nothing and says why when the configuration is incomplete', () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const { container } = render(<MosparoField host={config.host} />);
 
     expect(container.innerHTML).toBe('');
+    expect(mosparoScripts()).toHaveLength(0);
     expect(consoleError).toHaveBeenCalledWith(
       expect.stringContaining('Missing mosparo config'),
     );
