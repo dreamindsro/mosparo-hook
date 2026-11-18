@@ -63,6 +63,11 @@ function defaultSettings() {
     refuseTokens: false,
     /** Wait this long before answering a verification request. */
     verifyDelayMs: 0,
+    /**
+     * Fail every verification, the way mosparo does for a submission that
+     * breaks one of its security rules (minimum time, equal submissions).
+     */
+    failVerification: false,
   };
 }
 
@@ -185,6 +190,8 @@ export function createFakeMosparo() {
 
     // A submit token can be verified once.
     entry.verified = true;
+
+    if (state.settings.failVerification) return fail('Verification failed.');
 
     if (hmac(toJson(formData)) !== body.formSignature) {
       return fail('Verification failed.');

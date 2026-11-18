@@ -13,6 +13,15 @@
     "outDir": "dist",
     "isolatedModules": true
   },
-  "include": ["src", "tests", "vitest.config.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src",
+    "tests",
+    "e2e",
+    "vitest.config.ts",
+    "playwright.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

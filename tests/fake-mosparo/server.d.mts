@@ -4,6 +4,7 @@ export interface FakeMosparoSettings {
   spamText: string;
   refuseTokens: boolean;
   verifyDelayMs: number;
+  failVerification: boolean;
 }
 
 export interface FakeMosparoRequest {
