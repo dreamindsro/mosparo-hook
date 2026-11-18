@@ -93,8 +93,5 @@
   "dependencies": {
     "@mosparo/api-client": "^2.0.0"
   },
-  "engines": {
-    "node": ">=18"
-  },
   "sideEffects": false
 }
