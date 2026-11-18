@@ -2,7 +2,9 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig([
   {
-    entry: ['src/index.ts'],
+    // React components and hooks. They only work in the browser, so the
+    // bundle is marked as a client module for React Server Components.
+    entry: { index: 'src/react/index.ts' },
     format: ['esm', 'cjs'],
     dts: true,
     external: ['react', 'react-dom'],
@@ -10,10 +12,10 @@ export default defineConfig([
     clean: true,
   },
   {
-    entry: ['src/server.ts'],
+    // Framework-independent browser code, and the server-side verification
+    entry: { core: 'src/core/index.ts', server: 'src/server.ts' },
     format: ['esm', 'cjs'],
     dts: true,
-    external: ['react', 'react-dom', '@mosparo/api-client'],
     clean: false,
   },
 ]);

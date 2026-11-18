@@ -1,3 +1,6 @@
+/** Fields with this prefix belong to the mosparo widget. */
+export const MOSPARO_FIELD_PREFIX = '_mosparo_';
+
 export const MOSPARO_SUBMIT_TOKEN_FIELD = '_mosparo_submitToken';
 export const MOSPARO_VALIDATION_TOKEN_FIELD = '_mosparo_validationToken';
 

@@ -10,11 +10,11 @@ import {
 
 const HOST = 'https://mosparo.test';
 
-let useMosparoScript: typeof import('../src/use-mosparo-script').useMosparoScript;
+let useMosparoScript: typeof import('../src/react/use-mosparo-script').useMosparoScript;
 
 beforeEach(async () => {
   vi.resetModules();
-  ({ useMosparoScript } = await import('../src/use-mosparo-script'));
+  ({ useMosparoScript } = await import('../src/react/use-mosparo-script'));
 });
 
 afterEach(() => {

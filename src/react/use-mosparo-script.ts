@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
-import { loadMosparoScript } from './script-loader';
+import { loadMosparoScript } from '../core/script';
 
 type ScriptStatus = 'loading' | 'ready' | 'error';
 
-export function useMosparoScript(host: string): ScriptStatus {
+/** Load mosparo's frontend script from `host` and report how far it is. */
+export function useMosparoScript(
+  host: string | undefined,
+  nonce?: string,
+): ScriptStatus {
   const [status, setStatus] = useState<ScriptStatus>(() => {
     if (typeof window === 'undefined') return 'loading';
     if (typeof window.mosparo === 'function') return 'ready';
@@ -21,7 +25,7 @@ export function useMosparoScript(host: string): ScriptStatus {
 
     let cancelled = false;
 
-    loadMosparoScript(host).then(
+    loadMosparoScript(host, { nonce }).then(
       () => {
         if (!cancelled) setStatus('ready');
       },
@@ -33,7 +37,7 @@ export function useMosparoScript(host: string): ScriptStatus {
     return () => {
       cancelled = true;
     };
-  }, [host]);
+  }, [host, nonce]);
 
   return status;
 }

@@ -2,7 +2,7 @@
   "name": "@dreamind-tools/mosparo-hook",
   "version": "0.5.4",
   "type": "module",
-  "description": "React/Next.js integration for mosparo spam protection",
+  "description": "React and Next.js integration for mosparo spam protection: form field, hook and server-side verification",
   "license": "MIT",
   "keywords": [
     "mosparo",
@@ -33,6 +33,16 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./core": {
+      "import": {
+        "types": "./dist/core.d.ts",
+        "default": "./dist/core.js"
+      },
+      "require": {
+        "types": "./dist/core.d.cts",
+        "default": "./dist/core.cjs"
+      }
+    },
     "./server": {
       "import": {
         "types": "./dist/server.d.ts",
@@ -58,17 +68,10 @@
     "test:watch": "vitest"
   },
   "peerDependencies": {
-    "@mosparo/api-client": "^1.2.0",
     "react": "^18 || ^19",
     "react-dom": "^18 || ^19"
   },
-  "peerDependenciesMeta": {
-    "@mosparo/api-client": {
-      "optional": true
-    }
-  },
   "devDependencies": {
-    "@mosparo/api-client": "^1.2.0",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^25.5.0",
@@ -83,5 +86,12 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "dependencies": {
+    "@mosparo/api-client": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "sideEffects": false
 }

@@ -1,31 +1,51 @@
 import type { MosparoConfig, MosparoServerConfig } from './types';
 
-export function resolveClientConfig(): MosparoConfig | null {
-  const host =
-    process.env.NEXT_PUBLIC_MOSPARO_HOST ?? process.env.MOSPARO_HOST;
-  const uuid =
-    process.env.NEXT_PUBLIC_MOSPARO_UUID ?? process.env.MOSPARO_UUID;
-  const publicKey =
-    process.env.NEXT_PUBLIC_MOSPARO_PUBLIC_KEY ??
-    process.env.MOSPARO_PUBLIC_KEY;
-
-  if (!host || !uuid || !publicKey) return null;
-
-  return { host, uuid, publicKey };
+/**
+ * Read an environment variable. `process` does not exist in every runtime
+ * (a Vite build, an edge worker), and Next.js replaces each
+ * `process.env.NEXT_PUBLIC_*` expression with its value at build time, so
+ * every variable is read through its own closure.
+ */
+function read(get: () => string | undefined): string | undefined {
+  try {
+    return get() || undefined;
+  } catch {
+    return undefined;
+  }
 }
 
-export function resolveServerConfig(): MosparoServerConfig | null {
+/**
+ * Widget config from the `NEXT_PUBLIC_MOSPARO_*` variables. Only public
+ * variables are read: they have the same value on the server and in the
+ * browser, so both render the same markup.
+ */
+export function clientConfigFromEnv(): Partial<MosparoConfig> {
+  return {
+    host: read(() => process.env.NEXT_PUBLIC_MOSPARO_HOST),
+    uuid: read(() => process.env.NEXT_PUBLIC_MOSPARO_UUID),
+    publicKey: read(() => process.env.NEXT_PUBLIC_MOSPARO_PUBLIC_KEY),
+  };
+}
+
+/**
+ * Server config from the environment: `MOSPARO_HOST`, `MOSPARO_PUBLIC_KEY`
+ * (or their `NEXT_PUBLIC_` variants) and `MOSPARO_PRIVATE_KEY`.
+ */
+export function serverConfigFromEnv(): MosparoServerConfig | null {
   const host =
-    process.env.MOSPARO_HOST ?? process.env.NEXT_PUBLIC_MOSPARO_HOST;
-  const uuid =
-    process.env.MOSPARO_UUID ?? process.env.NEXT_PUBLIC_MOSPARO_UUID;
+    read(() => process.env.MOSPARO_HOST) ??
+    read(() => process.env.NEXT_PUBLIC_MOSPARO_HOST);
   const publicKey =
-    process.env.MOSPARO_PUBLIC_KEY ?? process.env.NEXT_PUBLIC_MOSPARO_PUBLIC_KEY;
-  const privateKey = process.env.MOSPARO_PRIVATE_KEY;
+    read(() => process.env.MOSPARO_PUBLIC_KEY) ??
+    read(() => process.env.NEXT_PUBLIC_MOSPARO_PUBLIC_KEY);
+  const privateKey = read(() => process.env.MOSPARO_PRIVATE_KEY);
 
-  if (!host || !uuid || !publicKey || !privateKey) return null;
+  if (!host || !publicKey || !privateKey) return null;
 
-  const verifySsl = process.env.MOSPARO_VERIFY_SSL !== 'false';
+  return { host, publicKey, privateKey };
+}
 
-  return { host, uuid, publicKey, privateKey, verifySsl };
+/** Whether this is a development build. */
+export function isDevelopment(): boolean {
+  return read(() => process.env.NODE_ENV) !== 'production';
 }
