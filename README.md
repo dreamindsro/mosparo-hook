@@ -139,6 +139,18 @@ const result = await verifySubmission(formData, {
 });
 ```
 
+#### Fields mosparo does not check
+
+The mosparo widget skips checkbox, radio, hidden and password inputs. The server has to leave the same fields out, otherwise the verification fails. List their names in `excludeFields`:
+
+```ts
+const result = await verifySubmission(formData, {
+  excludeFields: ['consent', 'newsletter'],
+});
+```
+
+File uploads and fields whose name starts with `_` or `$` are left out automatically.
+
 #### Return type
 
 ```ts
@@ -161,7 +173,7 @@ npm run typecheck
 npm run build       # bundle to dist/ with tsup
 ```
 
-The tests live in `tests/` and run without a mosparo instance: the widget script and `@mosparo/api-client` are mocked. CI runs typecheck, tests and build on Node.js 22, 24 and 26.
+The tests live in `tests/` and run without a mosparo instance: `@mosparo/api-client` is mocked, and the widget is either a stand-in or mosparo's own frontend script (kept in `tests/fixtures`) talking to a fake server. CI runs typecheck, tests and build on Node.js 22, 24 and 26.
 
 ## License
 
