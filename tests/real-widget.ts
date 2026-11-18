@@ -9,6 +9,8 @@ interface FakeMosparoServer {
   submitTokenResponse: Record<string, unknown>;
   /** Answer to `/api/v1/frontend/check-form-data`. */
   checkFormDataResponse: Record<string, unknown>;
+  /** Answer every request with a server error. */
+  down: boolean;
 }
 
 const frontendScript = readFileSync(
@@ -27,6 +29,7 @@ export function installRealMosparo(): FakeMosparoServer {
     requests: [],
     submitTokenResponse: { submitToken: 'submit-token' },
     checkFormDataResponse: { valid: true, validationToken: 'validation-token' },
+    down: false,
   };
 
   class FakeXMLHttpRequest {
@@ -52,10 +55,11 @@ export function installRealMosparo(): FakeMosparoServer {
         ? server.submitTokenResponse
         : server.checkFormDataResponse;
 
-      queueMicrotask(() => {
+      // Like a real response, this arrives in a later task.
+      setTimeout(() => {
         this.readyState = 4;
-        this.status = 200;
-        this.responseText = JSON.stringify(response);
+        this.status = server.down ? 500 : 200;
+        this.responseText = server.down ? '' : JSON.stringify(response);
         this.onreadystatechange?.();
       });
     }

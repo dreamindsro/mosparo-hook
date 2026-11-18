@@ -8,7 +8,6 @@ const MOSPARO_ENV_VARS = [
   'MOSPARO_UUID',
   'MOSPARO_PUBLIC_KEY',
   'MOSPARO_PRIVATE_KEY',
-  'MOSPARO_VERIFY_SSL',
 ];
 
 /** Start a test without any mosparo configuration in the environment. */

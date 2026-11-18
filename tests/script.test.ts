@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  createMosparoMock,
   failScriptLoad,
   finishScriptLoad,
   mosparoScripts,
@@ -10,11 +11,11 @@ const HOST = 'https://mosparo.test';
 
 // The loader remembers what it has loaded for the lifetime of the page, so
 // every test gets a fresh copy of the module and a clean document.
-let loadMosparoScript: typeof import('../src/script-loader').loadMosparoScript;
+let loadMosparoScript: typeof import('../src/core/script').loadMosparoScript;
 
 beforeEach(async () => {
   vi.resetModules();
-  ({ loadMosparoScript } = await import('../src/script-loader'));
+  ({ loadMosparoScript } = await import('../src/core/script'));
 });
 
 afterEach(resetPage);
@@ -63,14 +64,43 @@ describe('loadMosparoScript', () => {
     ]);
   });
 
-  it('reuses a script tag that is already on the page', async () => {
+  it('accepts a host with a trailing slash', () => {
+    void loadMosparoScript('https://mosparo.test/');
+
+    expect(mosparoScripts()[0].src).toBe(
+      'https://mosparo.test/build/mosparo-frontend.js',
+    );
+  });
+
+  it('puts the given nonce on the script tag', () => {
+    void loadMosparoScript(HOST, { nonce: 'r4nd0m' });
+
+    expect(mosparoScripts()[0].nonce).toBe('r4nd0m');
+  });
+
+  it('adds no script when mosparo is already on the page', async () => {
+    window.mosparo = createMosparoMock() as unknown as Window['mosparo'];
+
+    await loadMosparoScript(HOST);
+
+    expect(mosparoScripts()).toHaveLength(0);
+  });
+
+  it('waits for a script tag that is already on the page instead of adding one', async () => {
     const existing = document.createElement('script');
     existing.src = `${HOST}/build/mosparo-frontend.js`;
     document.head.appendChild(existing);
 
-    await loadMosparoScript(HOST);
+    const onLoaded = vi.fn();
+    const loading = loadMosparoScript(HOST).then(onLoaded);
+    await Promise.resolve();
 
     expect(mosparoScripts()).toEqual([existing]);
+    expect(onLoaded).not.toHaveBeenCalled();
+
+    finishScriptLoad(existing);
+    await loading;
+    expect(onLoaded).toHaveBeenCalledOnce();
   });
 
   it('rejects when the script cannot be loaded', async () => {
