@@ -22,6 +22,44 @@ export interface MosparoFieldProps {
   onError?: (error: Error) => void;
 }
 
+/** The parts of a mosparo widget instance that cleanup has to reach. */
+interface MosparoWidget {
+  formElement?: HTMLFormElement | null;
+  hpFieldElement?: HTMLElement | null;
+  countdownInterval?: ReturnType<typeof setInterval> | null;
+  onSubmit?: EventListener;
+  options?: Record<string, unknown>;
+  [member: string]: unknown;
+}
+
+const noop = () => {};
+
+/**
+ * Disconnect a widget that is being replaced or removed.
+ *
+ * The widget registers a submit listener on the form that blocks every submit
+ * it has not checked itself. Left in place after the widget is gone, it would
+ * block the form for good, so it has to be removed. The widget's other
+ * listeners and pending requests cannot be removed; its methods and callbacks
+ * are turned off instead, so that they no longer touch the form.
+ */
+function detachWidget(widget: MosparoWidget): void {
+  const form = widget.formElement;
+  if (form && widget.onSubmit) {
+    form.removeEventListener('submit', widget.onSubmit);
+  }
+  form?.classList.remove('mosparo__form-with-invisible-box');
+  widget.hpFieldElement?.remove();
+  if (widget.countdownInterval) clearInterval(widget.countdownInterval);
+
+  for (const key of Object.keys(widget)) {
+    if (typeof widget[key] === 'function') widget[key] = noop;
+  }
+  for (const key of Object.keys(widget.options ?? {})) {
+    if (typeof widget.options![key] === 'function') widget.options![key] = null;
+  }
+}
+
 export function MosparoField({
   host: hostProp,
   uuid: uuidProp,
@@ -120,8 +158,15 @@ export function MosparoField({
       mergedOptions.doSubmitFormInvisible = () =>
         invisibleCallbacksRef.current?.doSubmitFormInvisible?.();
 
+    let widget: MosparoWidget | undefined;
     try {
-      new window.mosparo(containerId, host!, uuid!, publicKey!, mergedOptions);
+      widget = new window.mosparo(
+        containerId,
+        host!,
+        uuid!,
+        publicKey!,
+        mergedOptions,
+      ) as MosparoWidget;
     } catch (err) {
       const error =
         err instanceof Error ? err : new Error('Failed to initialize mosparo');
@@ -131,10 +176,15 @@ export function MosparoField({
       }
     }
 
-    // Cleanup: mosparo has no destroy method, so clear the container
+    // Cleanup: mosparo has no destroy method, so take the widget off the form
+    // and clear the container
     return () => {
+      if (widget) detachWidget(widget);
       const el = document.getElementById(containerId);
-      if (el) el.innerHTML = '';
+      if (el) {
+        el.innerHTML = '';
+        el.removeAttribute('class');
+      }
     };
   }, [configValid, scriptStatus, containerId, host, uuid, publicKey, options]);
 

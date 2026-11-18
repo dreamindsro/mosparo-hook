@@ -5,6 +5,8 @@ import { vi } from 'vitest';
 interface FakeMosparoServer {
   /** Every request the widget made, in order. */
   requests: { endpoint: string; data: Record<string, string> }[];
+  /** Answer to `/api/v1/frontend/request-submit-token`. */
+  submitTokenResponse: Record<string, unknown>;
   /** Answer to `/api/v1/frontend/check-form-data`. */
   checkFormDataResponse: Record<string, unknown>;
 }
@@ -23,6 +25,7 @@ const frontendScript = readFileSync(
 export function installRealMosparo(): FakeMosparoServer {
   const server: FakeMosparoServer = {
     requests: [],
+    submitTokenResponse: { submitToken: 'submit-token' },
     checkFormDataResponse: { valid: true, validationToken: 'validation-token' },
   };
 
@@ -46,7 +49,7 @@ export function installRealMosparo(): FakeMosparoServer {
       });
 
       const response = this.endpoint.endsWith('/request-submit-token')
-        ? { submitToken: 'submit-token' }
+        ? server.submitTokenResponse
         : server.checkFormDataResponse;
 
       queueMicrotask(() => {

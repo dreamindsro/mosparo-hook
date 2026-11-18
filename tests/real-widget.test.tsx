@@ -1,5 +1,5 @@
 import { act, cleanup, render } from '@testing-library/react';
-import type { FormEvent, ReactNode } from 'react';
+import { StrictMode, useState, type FormEvent, type ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MosparoField, type MosparoFieldProps } from '../src';
 import { clearMosparoEnv, resetPage } from './helpers';
@@ -104,5 +104,53 @@ describe('MosparoField with the real mosparo widget', () => {
     await renderForm((onSubmit) => <ContactForm onSubmit={onSubmit} />);
 
     expect(server.requests[0].data.publicKey).toBe('public-key');
+  });
+
+  describe('when the widget is created more than once', () => {
+    it('can still be submitted under StrictMode, which mounts the field twice', async () => {
+      const form = await renderForm((onSubmit) => (
+        <StrictMode>
+          <ContactForm onSubmit={onSubmit} />
+        </StrictMode>
+      ));
+
+      await form.tickCheckbox();
+      await form.pressSend();
+
+      expect(form.submitted).toHaveBeenCalledOnce();
+    });
+
+    it('can still be submitted after a re-render with a new options object', async () => {
+      let rerenderParent!: () => void;
+      function Page({ onSubmit }: { onSubmit: SubmitHandler }) {
+        const [, setRenders] = useState(0);
+        rerenderParent = () => setRenders((renders) => renders + 1);
+        return <ContactForm onSubmit={onSubmit} options={{ language: 'cs' }} />;
+      }
+
+      const form = await renderForm((onSubmit) => <Page onSubmit={onSubmit} />);
+      await act(async () => rerenderParent());
+      await settle();
+
+      await form.tickCheckbox();
+      await form.pressSend();
+
+      expect(form.submitted).toHaveBeenCalledOnce();
+    });
+
+    it('leaves only the honeypot field of the current widget in the form', async () => {
+      server.submitTokenResponse = {
+        submitToken: 'submit-token',
+        honeypotFieldName: 'website',
+      };
+
+      const form = await renderForm((onSubmit) => (
+        <StrictMode>
+          <ContactForm onSubmit={onSubmit} />
+        </StrictMode>
+      ));
+
+      expect(form.container.querySelectorAll('[name="website"]')).toHaveLength(1);
+    });
   });
 });
