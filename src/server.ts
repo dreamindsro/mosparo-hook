@@ -65,11 +65,20 @@ export async function verifySubmission(
     // Dynamic import to keep @mosparo/api-client out of client bundles
     const { Client } = await import('@mosparo/api-client');
 
+    // The client hands these options to axios. Certificate checks are on
+    // unless they are turned off explicitly, e.g. for a self-signed
+    // certificate on an internal mosparo host.
+    const clientOptions: Record<string, unknown> = {};
+    if (config.verifySsl === false) {
+      const { Agent } = await import('node:https');
+      clientOptions.httpsAgent = new Agent({ rejectUnauthorized: false });
+    }
+
     const client = new Client(
       config.host,
       config.publicKey,
       config.privateKey,
-      { verifySsl: config.verifySsl ?? true },
+      clientOptions,
     );
 
     const result = await client.verifySubmission(

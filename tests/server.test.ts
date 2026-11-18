@@ -1,4 +1,5 @@
 // @vitest-environment node
+import { Agent } from 'node:https';
 import { Client, VerificationResult } from '@mosparo/api-client';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { verifySubmission } from '../src/server';
@@ -210,6 +211,38 @@ describe('verifySubmission', () => {
         error: expect.stringContaining('Missing mosparo server config'),
       });
       expect(Client).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('TLS certificate checks', () => {
+    /** The options verifySubmission created the API client with. */
+    const clientOptions = () =>
+      vi.mocked(Client).mock.calls[0][3] as { httpsAgent?: Agent };
+
+    it('are left on by default', async () => {
+      await verifySubmission({ name: 'Ada', ...tokens }, { config });
+
+      expect(clientOptions()).toEqual({});
+    });
+
+    it('are turned off for the mosparo host with verifySsl: false', async () => {
+      await verifySubmission(
+        { name: 'Ada', ...tokens },
+        { config: { ...config, verifySsl: false } },
+      );
+
+      const { httpsAgent } = clientOptions();
+      expect(httpsAgent).toBeInstanceOf(Agent);
+      expect(httpsAgent?.options.rejectUnauthorized).toBe(false);
+    });
+
+    it('are turned off with MOSPARO_VERIFY_SSL=false', async () => {
+      setServerEnv();
+      vi.stubEnv('MOSPARO_VERIFY_SSL', 'false');
+
+      await verifySubmission({ name: 'Ada', ...tokens });
+
+      expect(clientOptions().httpsAgent?.options.rejectUnauthorized).toBe(false);
     });
   });
 
