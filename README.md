@@ -141,15 +141,15 @@ const result = await verifySubmission(formData, {
 
 #### Fields mosparo does not check
 
-The mosparo widget skips checkbox, radio, hidden and password inputs. The server has to leave the same fields out, otherwise the verification fails. List their names in `excludeFields`:
+The mosparo widget skips checkbox, radio, hidden, password and file inputs, so mosparo never verifies them. Sending them along does not make the verification fail, but mosparo then receives a hash of each value. Keep secrets such as passwords and tokens out with `excludeFields`:
 
 ```ts
 const result = await verifySubmission(formData, {
-  excludeFields: ['consent', 'newsletter'],
+  excludeFields: ['password', 'csrfToken'],
 });
 ```
 
-File uploads and fields whose name starts with `_` or `$` are left out automatically.
+File uploads and fields whose name starts with `_` or `$` are left out automatically. A text field that the widget does read must therefore not have such a name: mosparo expects every field it has seen and rejects the submission when one is missing.
 
 #### Return type
 
