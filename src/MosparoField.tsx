@@ -134,8 +134,8 @@ export function MosparoField({
           ...(args as [string, unknown]),
         );
     if (cbs?.onCheckForm)
-      mergedOptions.onCheckForm = () =>
-        callbacksRef.current?.onCheckForm?.();
+      mergedOptions.onCheckForm = (valid: boolean) =>
+        callbacksRef.current?.onCheckForm?.(valid);
     if (cbs?.onResetState)
       mergedOptions.onResetState = () =>
         callbacksRef.current?.onResetState?.();

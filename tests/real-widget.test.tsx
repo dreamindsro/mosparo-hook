@@ -106,6 +106,20 @@ describe('MosparoField with the real mosparo widget', () => {
     expect(server.requests[0].data.publicKey).toBe('public-key');
   });
 
+  it('tells onCheckForm whether mosparo accepted the form', async () => {
+    const onCheckForm = vi.fn();
+    const form = await renderForm((onSubmit) => (
+      <ContactForm onSubmit={onSubmit} callbacks={{ onCheckForm }} />
+    ));
+
+    await form.tickCheckbox();
+    expect(onCheckForm).toHaveBeenLastCalledWith(true);
+
+    server.checkFormDataResponse = { valid: false };
+    await form.tickCheckbox();
+    expect(onCheckForm).toHaveBeenLastCalledWith(false);
+  });
+
   describe('when the widget is created more than once', () => {
     it('can still be submitted under StrictMode, which mounts the field twice', async () => {
       const form = await renderForm((onSubmit) => (

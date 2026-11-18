@@ -25,7 +25,7 @@ export interface MosparoCallbacks {
   onBeforeGetFormData?: (formData: Record<string, unknown>) => Record<string, unknown>;
   onGetFormData?: (formData: Record<string, unknown>) => void;
   onGetFieldValue?: (fieldName: string, fieldValue: unknown) => unknown;
-  onCheckForm?: () => void;
+  onCheckForm?: (valid: boolean) => void;
   onResetState?: () => void;
   onAbortSubmit?: () => void;
 }
